@@ -15,10 +15,11 @@ from geometry_msgs.msg import Quaternion, Pose, Point, Vector3
 from std_msgs.msg import Header, ColorRGBA
 
 ### Add initial belief HERE ### 
+belief = [0.1] * 10
 
 
 ### Add corridor map HERE ### 
-
+corridor_map = [0, 1, 0, 1, 0, 0, 0, 1, 0, 0]
 
 # change these values modifying ROS parameters
 kernel = [.1, .8, .1]
@@ -107,6 +108,7 @@ def create_rviz_markers(marker_pub, dist):
                 color=ColorRGBA(0.0, 1.0, 0.0, 0.8),
                 text=str(prob_value)[:5])
     marker_pub.publish(text_marker)
+    
     rospy.sleep(0.02)
     column_marker = Marker(
                 type=Marker.CUBE,

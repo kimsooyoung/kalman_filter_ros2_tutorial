@@ -28,6 +28,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'rviz_pub_node = bayes_tutorials.rviz_pub:main',
         ],
     },
 )
