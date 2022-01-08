@@ -1,3 +1,4 @@
 
 cbp bayes_tutorials && rosfoxy
 ros2 launch bayes_tutorials bayes_filter.launch.py
+
