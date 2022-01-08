@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Starts laser ray localization node -->
+
+<launch>
+    <!-- Set accordingly -->-->
+    <arg name="laser_scan_topic" default="/kobuki/laser/scan"/>
+    <arg name="obstacle_in_front_distance" default="11"/>
+
+    <node pkg="kalman_filter" name="laser_ray_localization_node" type="laser_ray_localization.py" output="screen">
+      <!-- the topic where the laser scan msg is being published by the robot -->
+      <param name="laser_scan_topic" value="$(arg laser_scan_topic)" />
+      <!-- value of obstacle front in x-axis (world coordinates) -->
+      <param name="obstacle_front_x_axis" value="$(arg obstacle_in_front_distance)" />
+    </node>
+</launch>

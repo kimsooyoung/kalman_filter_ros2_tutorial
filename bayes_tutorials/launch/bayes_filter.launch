@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Starts Bayes Filter Node -->
+
+<launch>
+
+<!-- set odometry_noise_profile as a list with 3 values [p_under, p_correct, p_over] that must sum up 1.0 -->
+<!-- where p_under = the probabilities for undershooting, p_correct = beeing spot on, p_over = overshooting -->
+<arg name="odometry_noise_profile" default="[.05, .9, .05]"/>
+<rosparam param="odometry_noise_profile" subst_value="True">$(arg odometry_noise_profile)</rosparam>
+<!-- Light sensor accuracy rate, meaning the frequency of correct readings (between 0.0 and 1.0) -->
+<param name="light_sensor_accuracy_rate" value="0.95"/>
+
+<node pkg="bayes_tutorials" name="bayes_filter_node" type="bayes_filter.py" output="screen"> 
+</node>
+
+<!-- Run Rviz with configuration file -->
+<node name="rviz" pkg="rviz" type="rviz" respawn="false" args="-d $(find bayes_tutorials)/rviz/bayes.rviz"/>
+
+<!-- Run the map server -->
+<arg name="map" default="$(find bayes_tutorials)/maps/grid_cells.yaml"/>
+<node type="map_server" pkg="map_server" name="map_server_node" output="screen" args="$(arg map)">
+  <!-- <param name="frame_id" value="/map" /> -->
+</node>
+
+</launch>

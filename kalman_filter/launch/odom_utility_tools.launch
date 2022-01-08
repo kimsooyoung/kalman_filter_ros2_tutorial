@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Starts Gazebo Odometry Utility Tool -->
+
+<launch>
+    <param name="model_name" value="mobile_base"/>
+    <node pkg="kalman_filter" name="odom_utility_tools_node" type="odom_utility_tools.py" output="screen"> 
+    </node>
+</launch>
