@@ -14,6 +14,8 @@ class VizMarkerPub(Node):
     def __init__(self):
         super().__init__("rviz_marker_publish_node")
 
+        
+
         self._marker_publisher = self.create_publisher(Marker, 'visualization_marker', 10)
         self._timer = self.create_timer(0.02, self.publish_callback)
 

@@ -29,6 +29,7 @@ setup(
     entry_points={
         'console_scripts': [
             'rviz_pub_node = bayes_tutorials.rviz_pub:main',
+            'bayes_filter_node = bayes_tutorials.ros2_bayes_filter:main',
         ],
     },
 )

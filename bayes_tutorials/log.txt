@@ -1,5 +1,10 @@
-
 cbp bayes_tutorials && rosfoxy
 ros2 launch bayes_tutorials bayes_filter.launch.py
 
+ros2 run bayes_tutorials rviz_pub_node
+ros2 run bayes_tutorials bayes_filter_node
+ros2 service call /request_motion_update std_srvs/srv/Empty
+ros2 service call /request_measurement_update std_srvs/srv/Empty
+
+service call with rqt
 
