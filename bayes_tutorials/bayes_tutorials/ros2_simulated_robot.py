@@ -1,9 +1,9 @@
+import time
 import rclpy
 
 from rclpy.node import Node
 from rclpy.duration import Duration
 
-import rospy
 from std_msgs.msg import Int32
 from std_msgs.msg import Int32MultiArray
 
@@ -15,152 +15,190 @@ from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Quaternion, Pose, Point, Vector3
 from std_msgs.msg import Header, ColorRGBA
 
-# Set an initial ground truth robot location (zero-index based)
-ground_truth_position = 5
-corridor_map = [0,1,0,1,0,0,0,1,0,0]
-odometry_noise_profile = [0.1, 0.8, 0.1]
-light_sensor_accuracy_rate = 0.9
-# errors in last 10 readings
-error_counter = 0
-flag_3_errors = False
-flag_5_errors = False
-# counter for accurate odometry and accurate light sensor readings
-flawless_cycle = 0
 
-# Temp global, for Rviz Markers
-ground_truth_publisher = rospy.Publisher('visualization_marker', Marker, queue_size=10)
+class SimulatedRobot(Node):
 
-# Callback function to handle new messages received
-def movement_cmd_callback(data):
-    global ground_truth_position, error_counter, flag_3_errors, flag_5_errors, flawless_cycle
-    print("Odometry data (noisy): %d" % data.data)
+    def __init__(self):
+        super().__init__("simulated_robot_node")
 
-    # Movement noise: real robot movement can be one less, equal, or one more than command
-    movement_noise = np.random.choice(
-        a=[-1,0,1], 
-        p=odometry_noise_profile
-    )
+        self._movement_sub = self.create_subscription(
+            Int32, "movement_cmd", self.movement_cmd_callback, 10
+        )
 
-    ground_truth_movement = data.data + movement_noise
+        self._marker_publisher = self.create_publisher(
+            Marker, "visualization_marker", 10
+        )
 
-    print("Odometry data (ground truth): %d" % ground_truth_movement)
-    # the corridor is circular: at the end of the corridor wrap around to the beginning
-    ground_truth_position = ((ground_truth_position + ground_truth_movement) % 10 )
-    if (int(movement_noise) is not 0):
-        error_counter += 1
-        print('\33[33m' + 'Notice the (intentional) inaccurate odometry reading (error occurs randomly)' + '\x1b[0m')
-        flawless_odometry = False
-        flawless_cycle = 0
-    else:
-        flawless_odometry = True
+        self._movement_data_pub = self.create_publisher(
+            Int32, "movement_data", 10
+        )
 
-    # initialise data variables to sent
-    motion_data = Int32()
-    light_sensor_data = Int32()
+        self._sensor_data_pub = self.create_publisher(
+            Int32, "sensor_data", 10
+        )
 
-    # Sensor noise: % of time sensor reading is wrong, % of time sensor reading is correct
-    sensor_reading_noisy = np.random.choice(
-        a=[
-            abs((corridor_map[ground_truth_position])-1),
-            corridor_map[ground_truth_position]
-        ], 
-        p=[
-            1-light_sensor_accuracy_rate, light_sensor_accuracy_rate
-        ])
-    print("\n")
-    print("Light sensor data (noisy): %d" % sensor_reading_noisy)
-    print("Light sensor data (ground truth): %d" % corridor_map[ground_truth_position])
-    if (int(sensor_reading_noisy) is not int (corridor_map[ground_truth_position])):
-        error_counter += 1
-        print('\33[33m' + 'Notice the (intentional) inaccurate light sensor reading (error occurs randomly)' + '\x1b[0m')
-        flawless_cycle = 0
-    else:
-        # reset warning counter after 5 cycles with both accurate odometry and accurate light sensor readings
-        # flawless light sensor
-        if (flawless_odometry):
-            flawless_cycle += 1
-            if flawless_cycle == 5:
-                # reset warnings
-                error_counter = 0
-                flawless_cycle = 0
-                flag_3_errors = False
-                flag_5_errors = False
-                print('\33[32m' + 'Great! With a few correct odometry and light sensor readings the Bayes Filter has a good chance of success.' '\x1b[0m')
-   
-    if (error_counter == 3 or error_counter == 4):
-        if not flag_3_errors:
-            flag_3_errors = True
-            print('\33[33m' + 'Warning: '+ str(error_counter) + ' erroneous readings in latest readings' '\x1b[0m')
-            print('\33[33m' + 'A Bayes Filter requires a few correct readings in a row to recover' '\x1b[0m')
-            print('\33[33m' + 'Otherwise localization will be difficult' '\x1b[0m')
-    elif (error_counter == 5 or error_counter == 6):
-        if not flag_5_errors:      
-            flag_5_errors = True
-            print('\33[31m' + 'Warning: '+ str(error_counter) + ' erroneous readings in latest readings' '\x1b[0m')
-            print('\33[31m' + 'A Bayes Filter requires a few correct readings in a row to recover' '\x1b[0m')
-            print('\33[31m' + 'Otherwise localization will be very difficult' '\x1b[0m')
+        # Set an initial ground truth robot location (zero-index based)
+        self._ground_truth_position = 5
+        self._corridor_map = [0,1,0,1,0,0,0,1,0,0]
+
+        # TODO: Make belows to params.
+        self._odometry_noise_profile = [0.1, 0.8, 0.1]
+        self._light_sensor_accuracy_rate = 0.9
+        
+        # errors in last 10 readings
+        self._error_counter = 0
+        self._flag_3_errors = False
+        self._flag_5_errors = False
+        
+        # counter for accurate odometry and accurate light sensor readings
+        self._flawless_cycle = 0
+        self._flawless_odometry = False
+
+    @property
+    def ground_truth_position(self):
+        return self._ground_truth_position
+
+    def movement_cmd_callback(self, data):
+
+        print("Odometry data (noisy): %d" % data.data)
+
+        # Movement noise: real robot movement can be one less, equal, or one more than command
+        movement_noise = np.random.choice(
+            a=[-1,0,1], 
+            p=self._odometry_noise_profile
+        )
+
+        ground_truth_movement = data.data + movement_noise
+
+        print("Odometry data (ground truth): %d" % ground_truth_movement)
+        
+        # the corridor is circular: at the end of the corridor wrap around to the beginning
+        self._ground_truth_position = ((self._ground_truth_position + ground_truth_movement) % 10 )
+        
+        if (int(movement_noise) != 0):
+            self._error_counter += 1
+            print('\33[33m' + 'Notice the (intentional) inaccurate odometry reading (error occurs randomly)' + '\x1b[0m')
+            self._flawless_odometry = False
+            self._flawless_cycle = 0
+        else:
+            self._flawless_odometry = True
+
+        # initialise data variables to sent
+        motion_data = Int32()
+        light_sensor_data = Int32()
+
+        # Sensor noise: % of time sensor reading is wrong, % of time sensor reading is correct
+        sensor_reading_noisy = np.random.choice(
+            a=[
+                abs((self._corridor_map[self._ground_truth_position])-1),
+                self._corridor_map[self._ground_truth_position]
+            ], 
+            p=[
+                1-self._light_sensor_accuracy_rate, self._light_sensor_accuracy_rate
+            ])
+        print("\n")
+        print("Light sensor data (noisy): %d" % sensor_reading_noisy)
+        print("Light sensor data (ground truth): %d" % self._corridor_map[self._ground_truth_position])
+        
+        if (int(sensor_reading_noisy) is not int (self._corridor_map[self._ground_truth_position])):
+            self._error_counter += 1
+            print('\33[33m' + 'Notice the (intentional) inaccurate light sensor reading (error occurs randomly)' + '\x1b[0m')
+            self._flawless_cycle = 0
+        else:
+            # reset warning counter after 5 cycles with both accurate odometry and accurate light sensor readings
+            # flawless light sensor
+            if (self._flawless_odometry):
+                self._flawless_cycle += 1
+                if self._flawless_cycle == 5:
+                    # reset warnings
+                    self._error_counter = 0
+                    self._flawless_cycle = 0
+                    self._flag_3_errors = False
+                    self._flag_5_errors = False
+                    print('\33[32m' + 'Great! With a few correct odometry and light sensor readings the Bayes Filter has a good chance of success.' '\x1b[0m')
     
-    # assign noisy movement and noisy measurement value to be send
-    motion_data.data = data.data
-    light_sensor_data.data = sensor_reading_noisy
+        if (self._error_counter == 3 or self._error_counter == 4):
+            if not self._flag_3_errors:
+                self._flag_3_errors = True
+                print('\33[33m' + 'Warning: '+ str(self._error_counter) + ' erroneous readings in latest readings' '\x1b[0m')
+                print('\33[33m' + 'A Bayes Filter requires a few correct readings in a row to recover' '\x1b[0m')
+                print('\33[33m' + 'Otherwise localization will be difficult' '\x1b[0m')
+        elif (self._error_counter == 5 or self._error_counter == 6):
+            if not self._flag_5_errors:      
+                self._flag_5_errors = True
+                print('\33[31m' + 'Warning: '+ str(self._error_counter) + ' erroneous readings in latest readings' '\x1b[0m')
+                print('\33[31m' + 'A Bayes Filter requires a few correct readings in a row to recover' '\x1b[0m')
+                print('\33[31m' + 'Otherwise localization will be very difficult' '\x1b[0m')
+        
+        # assign noisy movement and noisy measurement value to be send
+        motion_data.data = data.data
+        light_sensor_data.data = int(sensor_reading_noisy)
 
-    pub_motion.publish(motion_data)
-    rospy.sleep(0.8)
-    pub_light_sensor.publish(light_sensor_data)
+        self._movement_data_pub.publish(motion_data)
+        time.sleep(0.8)
+        self._sensor_data_pub.publish(light_sensor_data)
 
-    print("\n")
-    print("Ground truth position of the robot (grid cell):")
-    print("[%d] \n" % ground_truth_position)
-    print("-----------------------------------------------------")
+        print("\n")
+        print("Ground truth position of the robot (grid cell):")
+        print("[%d] \n" % self._ground_truth_position)
+        print("-----------------------------------------------------")
 
-    ### Visualize ground truth position of the robot in Rviz ###
-    robot_marker = Marker(
-            type=Marker.CYLINDER,
-            id=99,
-            lifetime=rospy.Duration(0),
-            pose=Pose(Point(-4.5+ground_truth_position, -0.5, 0.25), Quaternion(0, 0, 0, 1)),
-            scale=Vector3(0.3, 0.3, 0.5),
-            header=Header(frame_id='map'),
-            color=ColorRGBA(0.0, 0.0, 1.0, 1.0))
-    ground_truth_publisher.publish(robot_marker)
+        ### Visualize ground truth position of the robot in Rviz ###
+        pose, scale, color = self.get_marker_elem()
+        robot_marker = Marker(
+                type=Marker.CYLINDER,
+                id=99,
+                lifetime=Duration(seconds=0.0).to_msg(),
+                pose=pose,
+                scale=scale,
+                header=Header(frame_id='map'),
+                color=color
+            )
 
-# Initialize a ROS node named "simulated_robot_node"
-rospy.init_node('simulated_robot_node')
-# Subscribe to the ROS topic called "movement_cmd"
-rospy.Subscriber("movement_cmd", Int32, movement_cmd_callback)
-# Publishes to data topic
-pub_motion = rospy.Publisher('movement_data', Int32, queue_size=10)
-pub_light_sensor = rospy.Publisher('sensor_data', Int32, queue_size=10)
+        self._marker_publisher.publish(robot_marker)
 
-if not rospy.has_param("/odometry_noise_profile"):
-    rospy.logwarn('Parameter [%s] not found, using default: %s' % (("/odometry_noise_profile"), "[.1, .8, .1]"))
-    odometry_noise_profile = rospy.get_param("/odometry_noise_profile", [.1, .8, .1])
+    def get_marker_elem(self):
 
-# Light sensor accuracy rate, meaning the frequency of correct readings (value between 0.0 and 1.0)
-if not rospy.has_param("/light_sensor_accuracy_rate"):
-    rospy.logwarn('Parameter [%s] not found, using default: %s' % (("/light_sensor_accuracy_rate"), "0.9"))
-    kernel = rospy.get_param("/light_sensor_accuracy_rate", 0.9)
+        pose = Pose()
+        pose.position.x = -4.5 + self._ground_truth_position
+        pose.position.y = -0.5
+        pose.position.z = 0.25
+        pose.orientation.x = 0.0
+        pose.orientation.y = 0.0
+        pose.orientation.z = 0.0
+        pose.orientation.w = 1.0
 
-def main():
+        scale = Vector3()
+        scale.x = 0.3
+        scale.y = 0.3
+        scale.z = 0.5
 
-    # Create a new ROS rate limiting timer
-    rate = rospy.Rate(5)
+        color = ColorRGBA()
+        color.r = 0.0
+        color.g = 0.0
+        color.b = 1.0
+        color.a = 1.0
+
+        return pose, scale, color
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    simulated_robot_node = SimulatedRobot()
 
     # Print start position
     print("-----------------------------------------------------\n")
     print("Started simulated robot node")
     print("Ground truth start position of the robot (grid cell):")
-    print("[%d] \n" % ground_truth_position)
+    print("[%d] \n" % simulated_robot_node.ground_truth_position)
     print("-----------------------------------------------------\n")
 
-    # Execute indefinitely until ROS tells the node to shut down.
-    while not rospy.is_shutdown():
+    rclpy.spin(simulated_robot_node)
 
-        # Sleep appropriately so as to limit the execution rate
-        rate.sleep()
+    simulated_robot_node.destroy_node()
 
-if __name__ == '__main__':
-    try:
-        main()
-    except rospy.ROSInterruptException:
-        pass
+    rclpy.shutdown()
+
+
+if __name__ == "__main__":
+    main()
