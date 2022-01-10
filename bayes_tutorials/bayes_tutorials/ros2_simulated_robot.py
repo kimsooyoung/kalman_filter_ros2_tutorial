@@ -40,11 +40,13 @@ class SimulatedRobot(Node):
         # Set an initial ground truth robot location (zero-index based)
         self._ground_truth_position = 5
         self._corridor_map = [0,1,0,1,0,0,0,1,0,0]
-
-        # TODO: Make belows to params.
-        self._odometry_noise_profile = [0.1, 0.8, 0.1]
-        self._light_sensor_accuracy_rate = 0.9
         
+        self.declare_parameter('kernel', [.05, .9, .05])
+        self.declare_parameter('light_sensor_accuracy_rate', 0.95)
+
+        self._odometry_noise_profile = self.get_parameter('kernel').value
+        self._light_sensor_accuracy_rate = self.get_parameter('light_sensor_accuracy_rate').value
+
         # errors in last 10 readings
         self._error_counter = 0
         self._flag_3_errors = False
@@ -143,6 +145,9 @@ class SimulatedRobot(Node):
         print("[%d] \n" % self._ground_truth_position)
         print("-----------------------------------------------------")
 
+        self.draw_marker()
+
+    def draw_marker(self):
         ### Visualize ground truth position of the robot in Rviz ###
         pose, scale, color = self.get_marker_elem()
         robot_marker = Marker(
@@ -192,6 +197,8 @@ def main(args=None):
     print("Ground truth start position of the robot (grid cell):")
     print("[%d] \n" % simulated_robot_node.ground_truth_position)
     print("-----------------------------------------------------\n")
+
+    simulated_robot_node.draw_marker()
 
     rclpy.spin(simulated_robot_node)
 

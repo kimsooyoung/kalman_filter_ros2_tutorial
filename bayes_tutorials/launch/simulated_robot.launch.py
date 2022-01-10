@@ -5,7 +5,7 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='bayes_tutorials',
-            executable='bayes_filter_node',
+            executable='simulated_robot',
             parameters=[
                 {'kernel': [.05, .9, .05]},
                 {'light_sensor_accuracy_rate': 0.95},
