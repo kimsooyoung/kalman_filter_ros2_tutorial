@@ -688,7 +688,7 @@
         <right_joint>wheel_right_joint</right_joint>
         <wheel_separation>.230</wheel_separation>
         <wheel_diameter>0.070</wheel_diameter>
-        <torque>1.0</torque>
+        <torque>5.0</torque>
         <velocity_command_timeout>0.6</velocity_command_timeout>
         <command_topic>cmd_vel</command_topic>
         <publish_odom>1</publish_odom>

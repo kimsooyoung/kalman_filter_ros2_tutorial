@@ -29,6 +29,7 @@ setup(
     entry_points={
         'console_scripts': [
             'teleport_service = kalman_filter.ros2_teleport_service:main',
+            'odom_utility_tools = kalman_filter.ros2_odom_utility_tools:main',
         ],
     },
 )

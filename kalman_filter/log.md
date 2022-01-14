@@ -42,3 +42,8 @@ string reference_frame      # Pose/twist are expressed relative to the  frame of
                             # Leaving empty or "world" defaults to inertial world frame.
 
 
+## odom_utility
+
+get_model_state => get_entity_state (gazebo_msgs/GetEntityState)
+
+꼬부기는 일직선으로 가질 못함 => 뉴런봇으로 변경
