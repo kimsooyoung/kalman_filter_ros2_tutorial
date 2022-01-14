@@ -1,41 +1,110 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Top-level launch file for the 1D Kalman Filter unit exercise -->
+import os
 
-<launch>
+from ament_index_python.packages import get_package_share_directory
 
-  <!-- Spawn brick wall model in Gazebo -->
-	<arg name= "pos_x" default = "11.5"/>
-	<arg name= "pos_y" default = "-0.5"/>
-	<arg name= "pos_z" default = "0.0"/>
-	<arg name= "yaw" default = "1.5708"/>
-	<arg name= "model_name" default= "brick_wall"/>
+from launch import LaunchDescription
+from launch.event_handlers import OnProcessExit
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.actions import IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler, TimerAction
 
-	<node name="spawn_wall" pkg="gazebo_ros" type="spawn_model"
-	args="-file $(find kalman_filter)/models/brick_box_3x1x3/model.sdf
-	-sdf
-	-x $(arg pos_x)
-	-y $(arg pos_y)
-	-z $(arg pos_z)
-	-Y $(arg yaw)
-	-model $(arg model_name)"
-	respawn="false" output="screen"/>
-  
-  <!-- The teleport service and associated parameters -->
-  <include file="$(find kalman_filter)/launch/teleport_service.launch">
-    <arg name="target_pose" default="[0, 0, 0, 0, 0, 0, 1]"/>
-  </include>
+from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
 
-  <!-- Starts Gazebo Odometry Utility Tool -->
-  <include file="$(find kalman_filter)/launch/odom_utility_tools.launch" />
-  
-  <!-- Starts laser ray localization node -->
-  <include file="$(find kalman_filter)/launch/laser_ray_localization.launch">
-    <arg name="laser_scan_topic" default="/kobuki/laser/scan"/>
-    <arg name="obstacle_in_front_distance" default="11"/>
-  </include>
-  
-  <!-- Send command to move robot in a straight line at constant velocity -->
-  <node pkg="rostopic" type="rostopic" name="twist_pub" 
-        args="pub cmd_vel geometry_msgs/Twist '{linear: {x: 0.5, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}' -r 10" />
+from osrf_pycommon.terminal_color import ansi
 
-</launch>
+import xacro
+
+
+def generate_launch_description():
+
+    pkg_path = os.path.join(get_package_share_directory('kalman_filter'))
+    world_path = os.path.join(pkg_path, 'worlds', 'kobuki_world.world')
+    pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
+
+    model_pkg_path = os.path.join(get_package_share_directory('sw_kobuki_description'))
+    gazebo_model_path = os.path.join(model_pkg_path, 'models')
+
+    if 'GAZEBO_MODEL_PATH' in os.environ:
+        os.environ['GAZEBO_MODEL_PATH'] += ":" + gazebo_model_path
+    else :
+        os.environ['GAZEBO_MODEL_PATH'] = gazebo_model_path
+
+    print(ansi("yellow"), "If it's your 1st time to download Gazebo model on your computer, it may take few minutes to finish.", ansi("reset"))
+
+    # Start Gazebo server
+    start_gazebo_server_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(pkg_gazebo_ros, 'launch', 'gzserver.launch.py')),
+        launch_arguments={'world': world_path}.items()
+    )
+
+    # Start Gazebo client    
+    start_gazebo_client_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(pkg_gazebo_ros, 'launch', 'gzclient.launch.py'))
+    )
+
+    # # Robot State Publisher
+    # urdf_file = os.path.join(pkg_path, 'urdf', 'turtlebot2.urdf')
+    # doc = xacro.parse(open(urdf_file))
+    # xacro.process_doc(doc)
+    # robot_description = {'robot_description': doc.toxml()}
+    # param = {'use_sim_time': False, 'robot_description': doc.toxml()}
+
+    # robot_state_publisher = Node(
+    #     package='robot_state_publisher',
+    #     executable='robot_state_publisher',
+    #     output='screen',
+    #     parameters=[robot_description]
+    # )
+
+    # # Joint State Publisher
+    # joint_state_publisher = Node(
+    #     package='joint_state_publisher',
+    #     executable='joint_state_publisher',
+    #     name='joint_state_publisher'
+    # )
+
+    # # Spawn Robot
+    # spawn_entity = Node(
+    #     package='gazebo_ros', 
+    #     executable='spawn_entity.py',
+    #     output='screen',
+    #     arguments=['-topic', 'robot_description', '-entity', 'turtlebot2'],
+    # )
+
+    # rviz_config_file = os.path.join(pkg_path, 'rviz', 'urdf_config_v2.rviz')
+
+    # # Launch RViz
+    # rviz = Node(
+    #     package='rviz2',
+    #     executable='rviz2',
+    #     name='rviz2',
+    #     output='screen',
+    #     arguments=['-d', rviz_config_file]
+    # )
+
+    # rqt robot steering
+    rqt_robot_steering = Node(
+        package='rqt_robot_steering',
+        executable='rqt_robot_steering',
+        name='rqt_robot_steering',
+        output='screen'
+    )
+
+    return LaunchDescription([
+
+        # ExecuteProcess(
+        #     cmd=['gzserver', '--verbose', 'libgazebo_ros_init.so'],
+        #     # additional_env=EnvironmentVariable('GAZEBO_MODEL_PATH'),
+        #     output='screen'),
+
+        # ExecuteProcess(
+        #     cmd=['gzclient'],
+        #     output='screen'),
+
+        start_gazebo_server_cmd,
+        start_gazebo_client_cmd,
+        # robot_state_publisher,
+        # joint_state_publisher,
+        # spawn_entity,
+        # rqt_robot_steering,
+    ])
