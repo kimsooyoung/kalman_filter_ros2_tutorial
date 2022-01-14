@@ -23,7 +23,7 @@ from rclpy.node import Node
 class RespawnClient(Node):
 
     def __init__(self):
-        super().__init__('kobuki_respawn_client')
+        super().__init__('robot_respawn_client')
 
         self._respawn_client = self.create_client(
             SetEntityState, 'set_entity_state'
@@ -60,7 +60,7 @@ class RespawnClient(Node):
 class TeleportServer(Node):
 
     def __init__(self):
-        super().__init__('kobuki_teleport_server')
+        super().__init__('robot_teleport_server')
 
         self._teleport_srv = self.create_service(
             Trigger, '/reset_model_pose', self.trigger_callback
@@ -68,7 +68,7 @@ class TeleportServer(Node):
 
         self._respawn_client = RespawnClient()
 
-        self.declare_parameter('model_name', 'kobuki_model')
+        self.declare_parameter('model_name', 'neuronbot2')
         self.declare_parameter('target_pose', [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0])
 
         self._model_name = self.get_parameter('model_name').value

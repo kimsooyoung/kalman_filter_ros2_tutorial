@@ -59,7 +59,7 @@ class EntityStateClient(Node):
 class TeleportClient(Node):
 
     def __init__(self):
-        super().__init__('kobuki_teleport_client')
+        super().__init__('robot_teleport_client')
 
         self._teleport_client = self.create_client(
             Trigger, 'reset_model_pose'
@@ -83,8 +83,10 @@ class OdomUtilNode(Node):
     def __init__(self):
         super().__init__('odometry_util_node')
 
-        self.declare_parameter('model_name', 'kobuki_model')
+        self.declare_parameter('model_name', 'neuronbot2')
+        self.declare_parameter('alpha', 0.4)
         self._model_name = self.get_parameter('model_name').value
+        self._alpha = self.get_parameter('alpha').value
 
         self._teleport_client = TeleportClient()
         self._entity_state_client = EntityStateClient(self._model_name)
@@ -96,6 +98,9 @@ class OdomUtilNode(Node):
         self._noisy_odom_publisher = self.create_publisher(
             Float64, 'noisy_odom_x', 1
         )
+
+        self.gt_x = Float64()
+        self.noisy_x = Float64()
 
         self._timer = self.create_timer(0.5, self.timer_callback)
 
@@ -117,6 +122,10 @@ class OdomUtilNode(Node):
                 self.get_logger().warn('==== Entity Client Execution Done ====')
 
         self.get_logger().info(f"Got ground truth pose.position.x: {ground_truth_x}" )
+        
+        ground_truth_delta = 0
+        last_ground_truth_x = 0
+        noisy_odom = 0
 
         if ground_truth_x > 10.0:
             
@@ -134,6 +143,23 @@ class OdomUtilNode(Node):
                     self.get_logger().info(f"==== Service Call Done : Result Message : {'Success' if state_response.success == True else 'Fail'} ====")
                 finally:
                     self.get_logger().warn('==== Teleport Execution Done ====')
+            
+            ground_truth_delta = 0
+            last_ground_truth_x = 0
+            noisy_odom = 0
+        
+        ground_truth_delta = ground_truth_x - last_ground_truth_x
+
+        sd_trans = self._alpha * (ground_truth_delta)
+        noisy_odom += np.random.normal(ground_truth_delta, sd_trans * sd_trans)
+        
+        self.gt_x.data = ground_truth_x
+        self.noisy_x.data = noisy_odom
+
+        self._ground_truth_publisher.publish(self.gt_x)
+        self._noisy_odom_publisher.publish(self.noisy_x)
+
+        last_ground_truth_x = ground_truth_x
 
 
 def main(args=None):
