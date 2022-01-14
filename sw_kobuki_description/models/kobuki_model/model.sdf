@@ -1,0 +1,576 @@
+<sdf version='1.6'>
+  <model name='kobuki_model'>
+    <link name='base_footprint'>
+      <pose frame=''>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose frame=''>0.009866 2.6e-05 0.010277 0 -0 0</pose>
+        <mass>2.4213</mass>
+        <inertia>
+          <ixx>0.0224044</ixx>
+          <ixy>-2.89213e-06</ixy>
+          <ixz>4.10737e-06</ixz>
+          <iyy>0.0226237</iyy>
+          <iyz>-1.24762e-06</iyz>
+          <izz>0.0394834</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_footprint_fixed_joint_lump__base_collision'>
+        <pose frame=''>0 0 0.06969 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.10938</length>
+            <radius>0.178</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_footprint_fixed_joint_lump__caster_back_link_collision_1'>
+        <pose frame=''>-0.135 0 0.0192 -1.5708 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.0176</length>
+            <radius>0.017</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>1e+06</kp>
+              <kd>100</kd>
+              <max_vel>1</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu>0</mu>
+              <mu2>0</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <collision name='base_footprint_fixed_joint_lump__caster_front_link_collision_2'>
+        <pose frame=''>0.115 0 0.0172 -1.5708 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.0176</length>
+            <radius>0.017</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>1e+06</kp>
+              <kd>100</kd>
+              <max_vel>1</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu>0</mu>
+              <mu2>0</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='base_footprint_fixed_joint_lump__base_link_visual'>
+        <pose frame=''>0.001 0 0.06219 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://kobuki_model/meshes/main_body.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>__default__</uri>
+            <name>__default__</name>
+          </script>
+        </material>
+      </visual>
+      <velocity_decay/>
+      <sensor name='bumpers' type='contact'>
+        <always_on>1</always_on>
+        <update_rate>50</update_rate>
+        <visualize>1</visualize>
+        <contact>
+          <collision>base_footprint_fixed_joint_lump__base_collision</collision>
+          <topic>__default_topic__</topic>
+        </contact>
+        <pose frame=''>0 0 0.0102 0 -0 0</pose>
+      </sensor>
+      <velocity_decay/>
+      <velocity_decay/>
+      <velocity_decay/>
+      <sensor name='cliff_sensor_front' type='ray'>
+        <always_on>1</always_on>
+        <update_rate>50</update_rate>
+        <visualize>1</visualize>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>50</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.0436</min_angle>
+              <max_angle>0.0436</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.01</min>
+            <max>0.15</max>
+            <resolution>1</resolution>
+          </range>
+        </ray>
+        <pose frame=''>0.156 0 0.0316 3.14159 1.57079 3.14159</pose>
+      </sensor>
+      <velocity_decay/>
+      <sensor name='cliff_sensor_left' type='ray'>
+        <always_on>1</always_on>
+        <update_rate>50</update_rate>
+        <visualize>1</visualize>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>50</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.0436</min_angle>
+              <max_angle>0.0436</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.01</min>
+            <max>0.15</max>
+            <resolution>1</resolution>
+          </range>
+        </ray>
+        <pose frame=''>0.08734 0.13601 0.0316 3.14159 1.57079 3.14159</pose>
+      </sensor>
+      <velocity_decay/>
+      <sensor name='cliff_sensor_right' type='ray'>
+        <always_on>1</always_on>
+        <update_rate>50</update_rate>
+        <visualize>1</visualize>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>50</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.0436</min_angle>
+              <max_angle>0.0436</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.01</min>
+            <max>0.15</max>
+            <resolution>1</resolution>
+          </range>
+        </ray>
+        <pose frame=''>0.085 -0.13601 0.0316 3.14159 1.57079 3.14159</pose>
+
+      </sensor>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+
+    <!-- imu_joint -->
+    <joint name="gyro_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>imu_link</child>
+      <pose>0.056 0.062 0.0202 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+      </axis>
+    </joint>
+
+    <link name="imu_link">
+      <sensor name='imu' type='imu'>
+        <always_on>1</always_on>
+        <update_rate>50</update_rate>
+        <visualize>0</visualize>
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type='gaussian'>
+                <mean>0</mean>
+                <stddev>1.96e-06</stddev>
+                <bias_mean>0</bias_mean>
+                <bias_stddev>0</bias_stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type='gaussian'>
+                <mean>0</mean>
+                <stddev>1.96e-06</stddev>
+                <bias_mean>0</bias_mean>
+                <bias_stddev>0</bias_stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type='gaussian'>
+                <mean>0</mean>
+                <stddev>1.96e-06</stddev>
+                <bias_mean>0</bias_mean>
+                <bias_stddev>0</bias_stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x>
+              <noise type='gaussian'>
+                <mean>0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type='gaussian'>
+                <mean>0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type='gaussian'>
+                <mean>0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+        <plugin name="kobuki_imu" filename="libgazebo_ros_imu_sensor.so">
+          <ros>
+            <argument>~/out:=imu</argument>
+          </ros>
+        </plugin>
+        <pose frame=''>0.056 0.062 0.0202 0 -0 0</pose>
+      </sensor>
+    </link>
+
+
+  <!-- base_link -->
+  <joint name="base_joint" type="fixed">
+    <parent>base_footprint</parent>
+    <child> base_link</child>
+     <pose>0 0 0.01 0 0 0</pose>
+  </joint>
+
+  <link name="base_link">
+    <inertial>
+      <pose>0.01 0 0 0 0 0 </pose>
+      <inertia>
+          <ixx>0.019995</ixx>
+          <ixy>0.000</ixy>
+          <ixz>0.000</ixz>
+          <iyy>0.019995</iyy>
+          <iyz>0.000</iyz>
+          <izz>0.03675</izz>
+      </inertia>
+      <mass>2.4</mass>
+    </inertial>
+  </link>
+  
+
+  <!-- Laser Link -->
+    <joint name="laser_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>laser</child>
+        <pose>-0.032 0 0.171 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+    </joint>
+
+    <link name="laser">
+      <inertial>
+        <pose>-0.020 0 0.161 0 0 0</pose>
+        <inertia>
+          <ixx>0.001</ixx>
+          <ixy>0.000</ixy>
+          <ixz>0.000</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0.000</iyz>
+          <izz>0.001</izz>
+        </inertia>
+        <mass>0.125</mass>
+      </inertial>
+
+      <collision name="laser_sensor_collision">
+        <pose>-0.020 0 0.161 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.0508</radius>
+            <length>0.055</length>
+          </cylinder>
+        </geometry>
+      </collision>
+
+      <visual name="hokuyo_laser">
+        <pose>-0.032 0 0.19 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://kobuki_model/meshes/hokuyo.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </visual>
+    <!-- HOKUYO URG-04LX-UG1 -->
+      <!-- 4m range -->
+      <!-- detection_angle 240 degrees -->
+      <!-- angle_resolution 0.36 degrees -->
+      <!-- update_rate 10Hz -->
+      
+    <!-- HOKUYO UST-10LX-UG1 -->
+      <!-- 10m range -->
+      <!-- 270 degrees -->
+      <!-- 0.25 degrees -->
+      <!-- update_rate 40Hz -->
+      <sensor name="hokuyo_sensor" type="ray">
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <pose>-0.032 0 0.19 0 0 0</pose>
+        <update_rate>30</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>270</samples>
+              <resolution>1.00</resolution>
+              <min_angle>-2.355796</min_angle>
+              <max_angle>2.355796</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.06</min>
+            <max>10.0</max>
+            <resolution>0.001</resolution>
+          </range>
+          <noise>
+          <!-- Noise parameters based on published spec for Hokuyo laser
+                 achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
+                 stddev of 0.01m will put 99.7% of samples within 0.03m of the true
+                 reading. -->
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="hokuyo_controller" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <argument>~/out:=scan</argument>
+          </ros>
+          <output_type>sensor_msgs/LaserScan</output_type>
+          <frame_name>laser</frame_name>
+        </plugin>
+      </sensor>
+    </link>
+
+    <link name='wheel_left_link'>
+      <pose frame=''>0 0.115 0.0352 -1.5708 0 0</pose>
+      <inertial>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>0.001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='wheel_left_link_collision'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.0206</length>
+            <radius>0.0352</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>1e+06</kp>
+              <kd>100</kd>
+              <max_vel>1</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='wheel_left_link_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://kobuki_model/meshes/wheel.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>__default__</uri>
+            <name>__default__</name>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+    <joint name='wheel_left_joint' type='revolute'>
+      <child>wheel_left_link</child>
+      <parent>base_footprint</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <link name='wheel_right_link'>
+      <pose frame=''>0 -0.115 0.0352 -1.5708 0 0</pose>
+      <inertial>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>0.001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='wheel_right_link_collision'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.0206</length>
+            <radius>0.035</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>1e+06</kp>
+              <kd>100</kd>
+              <max_vel>1</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='wheel_right_link_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://kobuki_model/meshes/wheel.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>__default__</uri>
+            <name>__default__</name>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+    <joint name='wheel_right_joint' type='revolute'>
+      <child>wheel_right_link</child>
+      <parent>base_footprint</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <static>0</static>
+
+    <plugin name="kobuki_diff_drive" filename="libgazebo_ros_diff_drive.so">
+      <ros>
+      </ros>
+      <update_rate>30</update_rate>
+
+      <!--wheels-->
+      <left_joint>wheel_left_joint</left_joint>
+      <right_joint>wheel_right_joint</right_joint>
+
+      <!--kinematics-->
+      <wheel_separation>.230</wheel_separation>
+      <wheel_diameter>0.070</wheel_diameter>
+
+      <!-- limits -->
+      <torque>1.0</torque>
+      <velocity_command_timeout>0.6</velocity_command_timeout>
+
+      <command_topic>cmd_vel</command_topic>
+
+      <!-- output -->
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+
+
+      <publish_wheel_tf>false</publish_wheel_tf>
+
+      <odometry_topic>odom</odometry_topic>
+      <odometry_frame>odom</odometry_frame>
+      <robot_base_frame>base_footprint</robot_base_frame>
+    </plugin>
+
+
+    <plugin name="kobuki_joint_state" filename="libgazebo_ros_joint_state_publisher.so">
+      
+      <ros>
+        <argument>~/out:=joint_states</argument>
+      </ros>
+      <update_rate>30</update_rate>
+      <joint_name>wheel_left_joint</joint_name>
+      <joint_name>wheel_right_joint</joint_name>
+    </plugin> 
+
+<!--     <plugin name='kobuki_controller' filename='libgazebo_ros_kobuki.so'>
+      <publish_tf>1</publish_tf>
+      <left_wheel_joint_name>wheel_left_joint</left_wheel_joint_name>
+      <right_wheel_joint_name>wheel_right_joint</right_wheel_joint_name>
+      <wheel_separation>.230</wheel_separation>
+      <wheel_diameter>0.070</wheel_diameter>
+      <torque>1.0</torque>
+      <velocity_command_timeout>0.6</velocity_command_timeout>
+      <cliff_sensor_left_name>cliff_sensor_left</cliff_sensor_left_name>
+      <cliff_sensor_center_name>cliff_sensor_front</cliff_sensor_center_name>
+      <cliff_sensor_right_name>cliff_sensor_right</cliff_sensor_right_name>
+      <cliff_detection_threshold>0.04</cliff_detection_threshold>
+      <bumper_name>bumpers</bumper_name>
+      <imu_name>imu</imu_name>
+    </plugin> -->
+  </model>
+</sdf>

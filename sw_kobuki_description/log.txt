@@ -1,0 +1,11 @@
+gazebo controller가 ros2가 되면서 이름이 조금씩 바뀜
+
+leftJoint => left_joint 이렇게
+
+https://github.com/ros-simulation/gazebo_ros_pkgs/wiki/ROS-2-Migration:-Diff-drive
+
+turtlebot2.urdf ros2로 파싱하다가 포기했다.
+그냥 깃허브 뒤져서 나오는 model 가져오고 통째로 gazebo world 저장하여 사용하기로 함
+https://github.com/bigdayangyu/kobuki_navigation/blob/master/kobuki_demo.repos
+
+

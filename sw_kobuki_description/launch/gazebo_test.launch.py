@@ -91,17 +91,17 @@ def generate_launch_description():
 
     return LaunchDescription([
 
-        ExecuteProcess(
-            cmd=['gzserver', '--verbose', 'libgazebo_ros_init.so'],
-            # additional_env=EnvironmentVariable('GAZEBO_MODEL_PATH'),
-            output='screen'),
+        # ExecuteProcess(
+        #     cmd=['gzserver', '--verbose', 'libgazebo_ros_init.so'],
+        #     # additional_env=EnvironmentVariable('GAZEBO_MODEL_PATH'),
+        #     output='screen'),
 
-        ExecuteProcess(
-            cmd=['gzclient'],
-            output='screen'),
+        # ExecuteProcess(
+        #     cmd=['gzclient'],
+        #     output='screen'),
 
-        # start_gazebo_server_cmd,
-        # start_gazebo_client_cmd,
+        start_gazebo_server_cmd,
+        start_gazebo_client_cmd,
         # robot_state_publisher,
         # joint_state_publisher,
         # spawn_entity,
