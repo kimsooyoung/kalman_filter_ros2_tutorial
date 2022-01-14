@@ -28,6 +28,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'teleport_service = kalman_filter.ros2_teleport_service:main',
         ],
     },
 )
