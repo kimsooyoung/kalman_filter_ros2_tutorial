@@ -37,7 +37,7 @@ if(BUILD_TESTING)
 endif()
 
 ## Install
-install(DIRECTORY launch worlds models
+install(DIRECTORY launch worlds models urdf
   DESTINATION  share/${PROJECT_NAME}/
 )
 

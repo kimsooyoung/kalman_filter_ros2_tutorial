@@ -42,6 +42,20 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(os.path.join(pkg_gazebo_ros, 'launch', 'gzclient.launch.py'))
     )
 
+    # Prepare Robot State Publisher Params
+    neuronbot_gazebo_pkg_path = os.path.join(get_package_share_directory('neuronbot2_gazebo'))
+    urdf_file = os.path.join(neuronbot_gazebo_pkg_path, 'urdf', 'neuronbot2.urdf')
+
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{'use_sim_time': True}],
+        arguments=[urdf_file],
+    )
+
+    #TODO: verbose option with args
     teleport_service = Node(
         package='kalman_filter',
         executable='teleport_service',
@@ -61,6 +75,21 @@ def generate_launch_description():
         ]
     )
 
+    laser_ray_localization = Node(
+        package='kalman_filter',
+        executable='laser_ray_localization',
+        output='screen',
+        parameters=[
+            {"obstacle_front_x_axis": 11.0},
+            {"laser_scan_topic": "scan"},
+        ]
+    )
+
+    move_forward = ExecuteProcess(
+        cmd=['ros2', 'topic', 'pub', '/cmd_vel', 'geometry_msgs/msg/Twist', '{linear: {x: 0.5, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}'],
+        output='screen'
+    )
+
     # rqt robot steering
     rqt_robot_steering = Node(
         package='rqt_robot_steering',
@@ -72,6 +101,9 @@ def generate_launch_description():
     return LaunchDescription([
         start_gazebo_server_cmd,
         start_gazebo_client_cmd,
+        robot_state_publisher,
         teleport_service,
         odom_utility,
+        laser_ray_localization,
+        move_forward,
     ])

@@ -21,7 +21,6 @@ https://github.com/ros-simulation/gazebo_ros_pkgs/wiki/ROS-2-Migration:-Entity-s
 
 teleport_service.py
 
-
 /reset_model_pose 라는 서비스 생성
 
 gazebo/get_world_properties => 이름 받아옴
@@ -47,3 +46,14 @@ string reference_frame      # Pose/twist are expressed relative to the  frame of
 get_model_state => get_entity_state (gazebo_msgs/GetEntityState)
 
 꼬부기는 일직선으로 가질 못함 => 뉴런봇으로 변경
+
+## laser_ray_localization
+
+param
+* obstacle_front_x_axis :11
+* laser_scan_topic : /scan
+
+communication 
+* Subscriber : LaserScan
+* Publisher : /position_from_laser_ray, Float64
+
