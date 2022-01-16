@@ -104,11 +104,11 @@ class TeleportServer(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    robot_turn_server = TeleportServer()
+    teleport_node = TeleportServer()
 
-    rclpy.spin(robot_turn_server)
+    rclpy.spin(teleport_node)
 
-    robot_turn_server.destroy_node()
+    teleport_node.destroy_node()
     rclpy.shutdown()
 
 

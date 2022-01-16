@@ -165,11 +165,11 @@ class OdomUtilNode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    robot_turn_server = OdomUtilNode()
+    odom_util_node = OdomUtilNode()
 
-    rclpy.spin(robot_turn_server)
+    rclpy.spin(odom_util_node)
 
-    robot_turn_server.destroy_node()
+    odom_util_node.destroy_node()
     rclpy.shutdown()
 
 
