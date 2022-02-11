@@ -46,8 +46,8 @@ def generate_launch_description():
         Node(
             condition=IfCondition(PythonExpression(['"', use_camera, '" == "none"'])),
             package='robot_state_publisher',
-            executable='robot_state_publisher',
-            name='robot_state_publisher',
+            node_executable='robot_state_publisher',
+            node_name='robot_state_publisher',
             output='screen',
             parameters=[{'use_sim_time': use_sim_time}],
             arguments=[nb2_urdf]),
@@ -56,8 +56,8 @@ def generate_launch_description():
         Node(
             condition=IfCondition(PythonExpression(['"', use_camera, '" == "front"'])),
             package='robot_state_publisher',
-            executable='robot_state_publisher',
-            name='robot_state_publisher',
+            node_executable='robot_state_publisher',
+            node_name='robot_state_publisher',
             output='screen',
             parameters=[{'use_sim_time': use_sim_time}],
             arguments=[nb2_w_front_camera_urdf]),
@@ -66,8 +66,8 @@ def generate_launch_description():
         Node(
             condition=IfCondition(PythonExpression(['"', use_camera, '" == "top"'])),
             package='robot_state_publisher',
-            executable='robot_state_publisher',
-            name='robot_state_publisher',
+            node_executable='robot_state_publisher',
+            node_name='robot_state_publisher',
             output='screen',
             parameters=[{'use_sim_time': use_sim_time}],
             arguments=[nb2_w_top_camera_urdf]),                        

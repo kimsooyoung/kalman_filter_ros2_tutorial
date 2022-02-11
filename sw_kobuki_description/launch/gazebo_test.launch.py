@@ -50,7 +50,7 @@ def generate_launch_description():
 
     robot_state_publisher = Node(
         package='robot_state_publisher',
-        executable='robot_state_publisher',
+        node_executable='robot_state_publisher',
         output='screen',
         parameters=[robot_description]
     )
@@ -58,14 +58,14 @@ def generate_launch_description():
     # Joint State Publisher
     joint_state_publisher = Node(
         package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher'
+        node_executable='joint_state_publisher',
+        node_name='joint_state_publisher'
     )
 
     # Spawn Robot
     spawn_entity = Node(
         package='gazebo_ros', 
-        executable='spawn_entity.py',
+        node_executable='spawn_entity.py',
         output='screen',
         arguments=['-topic', 'robot_description', '-entity', 'turtlebot2'],
     )
@@ -75,7 +75,7 @@ def generate_launch_description():
     # # Launch RViz
     # rviz = Node(
     #     package='rviz2',
-    #     executable='rviz2',
+    #     node_executable='rviz2',
     #     name='rviz2',
     #     output='screen',
     #     arguments=['-d', rviz_config_file]
@@ -84,8 +84,8 @@ def generate_launch_description():
     # rqt robot steering
     rqt_robot_steering = Node(
         package='rqt_robot_steering',
-        executable='rqt_robot_steering',
-        name='rqt_robot_steering',
+        node_executable='rqt_robot_steering',
+        node_name='rqt_robot_steering',
         output='screen'
     )
 
