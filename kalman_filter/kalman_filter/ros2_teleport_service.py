@@ -68,7 +68,7 @@ class TeleportServer(Node):
 
         self.declare_parameter('model_name', 'neuronbot2')
         self.declare_parameter('target_pose', [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0])
-        self.declare_parameter('verbose', True)
+        self.declare_parameter('verbose', "True")
 
         self._model_name = self.get_parameter('model_name').value
         self._target_pose = self.get_parameter('target_pose').value

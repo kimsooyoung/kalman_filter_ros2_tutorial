@@ -93,7 +93,7 @@ class OdomUtilNode(Node):
 
         self.declare_parameter('model_name', 'neuronbot2')
         self.declare_parameter('alpha', 0.4)
-        self.declare_parameter('verbose', True)
+        self.declare_parameter('verbose', "True")
 
         self._model_name = self.get_parameter('model_name').value
         self._alpha = self.get_parameter('alpha').value
@@ -113,7 +113,9 @@ class OdomUtilNode(Node):
         self.gt_x = Float64()
         self.noisy_x = Float64()
 
-        self._timer = self.create_timer(0.5, self.timer_callback)
+        self._timer = self.create_timer(0.3, self.timer_callback)
+        self.last_ground_truth_x = 0
+        self.noisy_odom = 0
 
     def timer_callback(self):
 
@@ -137,8 +139,6 @@ class OdomUtilNode(Node):
             self.get_logger().info(f"Got ground truth pose.position.x: {ground_truth_x}" )
         
         ground_truth_delta = 0
-        last_ground_truth_x = 0
-        noisy_odom = 0
 
         if ground_truth_x > 10.0:
             
@@ -160,22 +160,25 @@ class OdomUtilNode(Node):
                         self.get_logger().warn('==== Teleport Execution Done ====')
             
             ground_truth_delta = 0
-            last_ground_truth_x = 0
-            noisy_odom = 0
+            self.last_ground_truth_x = 0
+            self.noisy_odom = 0
         
-        ground_truth_delta = ground_truth_x - last_ground_truth_x
+        # noisy_odom = ground_truth_x
+        ground_truth_delta = ground_truth_x - self.last_ground_truth_x
+        
+        if abs(ground_truth_delta) > 8.0:
+            ground_truth_delta = 0
 
         sd_trans = self._alpha * (ground_truth_delta)
-        noisy_odom += np.random.normal(ground_truth_delta, sd_trans * sd_trans)
+        self.noisy_odom += np.random.normal(ground_truth_delta, sd_trans * sd_trans)
         
         self.gt_x.data = ground_truth_x
-        self.noisy_x.data = noisy_odom
+        self.noisy_x.data = self.noisy_odom
 
         self._ground_truth_publisher.publish(self.gt_x)
         self._noisy_odom_publisher.publish(self.noisy_x)
 
-        last_ground_truth_x = ground_truth_x
-
+        self.last_ground_truth_x = ground_truth_x
 
 def main(args=None):
     rclpy.init(args=args)

@@ -57,3 +57,4 @@ communication
 * Subscriber : LaserScan
 * Publisher : /position_from_laser_ray, Float64
 
+ source /usr/share/gazebo/setup.sh

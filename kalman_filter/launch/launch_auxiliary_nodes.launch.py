@@ -71,6 +71,7 @@ def generate_launch_description():
         output='screen',
         parameters=[
             {"model_name": "neuronbot2"},
+            {"alpha": 4.0},
             {"verbose": "False"},
         ]
     )
@@ -104,6 +105,6 @@ def generate_launch_description():
         robot_state_publisher,
         teleport_service,
         odom_utility,
-        laser_ray_localization,
+        # laser_ray_localization,
         move_forward,
     ])
