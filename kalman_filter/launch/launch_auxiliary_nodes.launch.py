@@ -62,6 +62,7 @@ def generate_launch_description():
         parameters=[
             {"model_name": "neuronbot2"},
             {"target_pose": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]},
+            {"verbose": "False"},
         ]
     )
 
@@ -71,6 +72,7 @@ def generate_launch_description():
         output='screen',
         parameters=[
             {"model_name": "neuronbot2"},
+            {"verbose": "False"},
         ]
     )
 
@@ -81,6 +83,7 @@ def generate_launch_description():
         parameters=[
             {"obstacle_front_x_axis": 11.0},
             {"laser_scan_topic": "scan"},
+            {"verbose": "False"},
         ]
     )
 

@@ -22,12 +22,14 @@ from rclpy.node import Node
 
 class RespawnClient(Node):
 
-    def __init__(self):
+    def __init__(self, verbose):
         super().__init__('robot_respawn_client')
 
         self._respawn_client = self.create_client(
             SetEntityState, 'set_entity_state'
         )
+
+        self._verbose = verbose
 
         while not self._respawn_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
@@ -54,7 +56,9 @@ class RespawnClient(Node):
         self.set_srv(model_name, target_pose)
         future = self._respawn_client.call_async(self._set_entity_req)
         
-        self.get_logger().info('=== Request Sended ===')
+        if self._verbose:
+            self.get_logger().info('=== Request Sended ===')
+
         return future
 
 class TeleportServer(Node):
@@ -62,17 +66,21 @@ class TeleportServer(Node):
     def __init__(self):
         super().__init__('robot_teleport_server')
 
+        self.declare_parameter('model_name', 'neuronbot2')
+        self.declare_parameter('target_pose', [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0])
+        self.declare_parameter('verbose', True)
+
+        self._model_name = self.get_parameter('model_name').value
+        self._target_pose = self.get_parameter('target_pose').value
+        self._verbose = eval(self.get_parameter('verbose').value)
+
+        self.get_logger().info(f"+++++++++++++++++++++++++++++++++ {type(self._verbose)} \n\n\n\n\n\n\n\n")
+        
         self._teleport_srv = self.create_service(
             Trigger, '/reset_model_pose', self.trigger_callback
         )
 
-        self._respawn_client = RespawnClient()
-
-        self.declare_parameter('model_name', 'neuronbot2')
-        self.declare_parameter('target_pose', [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0])
-
-        self._model_name = self.get_parameter('model_name').value
-        self._target_pose = self.get_parameter('target_pose').value
+        self._respawn_client = RespawnClient(self._verbose)
 
     def __del__(self):
         super().__del__()
@@ -92,12 +100,16 @@ class TeleportServer(Node):
                     'exception while calling service: %r' % future.exception()
                 )
             else:
-                self.get_logger().info(f"==== Service Call Done : Result Message : {'Success' if spawn_response.success == True else 'Fail'} ====")
+                if self._verbose:
+                    self.get_logger().info(f"==== Service Call Done : Result Message : {'Success' if spawn_response.success == True else 'Fail'} ====")
             finally:
-                self.get_logger().info('==== Execution Done ====')
+                if self._verbose:
+                    self.get_logger().info('==== Execution Done ====')
         
         response.success = True
-        self.get_logger().warn('Respawn Process Done...')
+
+        if self._verbose:
+            self.get_logger().warn('Respawn Process Done...')
 
         return response
 

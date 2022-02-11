@@ -34,12 +34,14 @@ import numpy as np
 
 class EntityStateClient(Node):
 
-    def __init__(self, model_name):
+    def __init__(self, model_name, verbose):
         super().__init__('reset_model_client')
 
         self._entity_state_client = self.create_client(
             GetEntityState, 'get_entity_state'
         )
+
+        self._verbose = verbose
 
         while not self._entity_state_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info(' [gazebo/get_entity_state] service not available, waiting again...')
@@ -52,14 +54,18 @@ class EntityStateClient(Node):
     def send_request(self):
         
         future = self._entity_state_client.call_async(self._entity_state_req)
-        self.get_logger().info('=== Request Sended ===')
+
+        if self._verbose:
+            self.get_logger().info('=== Request Sended ===')
         
         return future
 
 class TeleportClient(Node):
 
-    def __init__(self):
+    def __init__(self, verbose):
         super().__init__('robot_teleport_client')
+
+        self._verbose = verbose
 
         self._teleport_client = self.create_client(
             Trigger, 'reset_model_pose'
@@ -74,7 +80,9 @@ class TeleportClient(Node):
     def send_request(self):
 
         future = self._teleport_client.call_async(self._trigger_req)
-        self.get_logger().info('=== Teleport Request Sended ===')
+
+        if self._verbose:
+            self.get_logger().info('=== Teleport Request Sended ===')
 
         return future
 
@@ -85,11 +93,14 @@ class OdomUtilNode(Node):
 
         self.declare_parameter('model_name', 'neuronbot2')
         self.declare_parameter('alpha', 0.4)
+        self.declare_parameter('verbose', True)
+
         self._model_name = self.get_parameter('model_name').value
         self._alpha = self.get_parameter('alpha').value
+        self._verbose = eval(self.get_parameter('verbose').value)
 
-        self._teleport_client = TeleportClient()
-        self._entity_state_client = EntityStateClient(self._model_name)
+        self._teleport_client = TeleportClient(self._verbose)
+        self._entity_state_client = EntityStateClient(self._model_name, self._verbose)
 
         self._ground_truth_publisher = self.create_publisher(
             Float64, 'ground_truth_x', 1
@@ -119,9 +130,11 @@ class OdomUtilNode(Node):
             else:
                 ground_truth_x = state_response.state.pose.position.x
             finally:
-                self.get_logger().warn('==== Entity Client Execution Done ====')
+                if self._verbose:
+                    self.get_logger().warn('==== Entity Client Execution Done ====')
 
-        self.get_logger().info(f"Got ground truth pose.position.x: {ground_truth_x}" )
+        if self._verbose:
+            self.get_logger().info(f"Got ground truth pose.position.x: {ground_truth_x}" )
         
         ground_truth_delta = 0
         last_ground_truth_x = 0
@@ -140,9 +153,11 @@ class OdomUtilNode(Node):
                         'exception while calling teleport service: %r' % teleport_client_future.exception()
                     )
                 else:
-                    self.get_logger().info(f"==== Service Call Done : Result Message : {'Success' if state_response.success == True else 'Fail'} ====")
+                    if self._verbose:
+                        self.get_logger().info(f"==== Service Call Done : Result Message : {'Success' if state_response.success == True else 'Fail'} ====")
                 finally:
-                    self.get_logger().warn('==== Teleport Execution Done ====')
+                    if self._verbose:
+                        self.get_logger().warn('==== Teleport Execution Done ====')
             
             ground_truth_delta = 0
             last_ground_truth_x = 0
