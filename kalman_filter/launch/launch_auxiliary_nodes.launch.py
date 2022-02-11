@@ -9,7 +9,6 @@ from launch.actions import IncludeLaunchDescription, ExecuteProcess, RegisterEve
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-1.7
 from osrf_pycommon.terminal_color import ansi
 
 import xacro
