@@ -9,11 +9,10 @@ from launch.actions import IncludeLaunchDescription, ExecuteProcess, RegisterEve
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-
+1.7
 from osrf_pycommon.terminal_color import ansi
 
 import xacro
-
 
 def generate_launch_description():
 
@@ -48,8 +47,8 @@ def generate_launch_description():
 
     robot_state_publisher = Node(
         package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
+        node_executable='robot_state_publisher',
+        node_name='robot_state_publisher',
         output='screen',
         parameters=[{'use_sim_time': True}],
         arguments=[urdf_file],
@@ -58,7 +57,7 @@ def generate_launch_description():
     #TODO: verbose option with args
     teleport_service = Node(
         package='kalman_filter',
-        executable='teleport_service',
+        node_executable='teleport_service',
         output='screen',
         parameters=[
             {"model_name": "neuronbot2"},
@@ -68,7 +67,7 @@ def generate_launch_description():
 
     odom_utility = Node(
         package='kalman_filter',
-        executable='odom_utility_tools',
+        node_executable='odom_utility_tools',
         output='screen',
         parameters=[
             {"model_name": "neuronbot2"},
@@ -77,7 +76,7 @@ def generate_launch_description():
 
     laser_ray_localization = Node(
         package='kalman_filter',
-        executable='laser_ray_localization',
+        node_executable='laser_ray_localization',
         output='screen',
         parameters=[
             {"obstacle_front_x_axis": 11.0},
@@ -93,7 +92,7 @@ def generate_launch_description():
     # rqt robot steering
     rqt_robot_steering = Node(
         package='rqt_robot_steering',
-        executable='rqt_robot_steering',
+        node_executable='rqt_robot_steering',
         name='rqt_robot_steering',
         output='screen'
     )

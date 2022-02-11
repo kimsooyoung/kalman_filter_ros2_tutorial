@@ -21,16 +21,16 @@ def generate_launch_description():
     
     map_server = Node(
         package='nav2_map_server',
-        executable='map_server',
-        name='map_server',
+        node_executable='map_server',
+        node_name='map_server',
         output='screen',
         parameters=[{'yaml_filename':map_file} ]
     )
 
     lifecycle_manager = Node(
         package='nav2_lifecycle_manager',
-        executable='lifecycle_manager',
-        name='lifecycle_manager_localization',
+        node_executable='lifecycle_manager',
+        node_name='lifecycle_manager_localization',
         output='screen',
         parameters=[
             {'use_sim_time': True},
@@ -41,8 +41,8 @@ def generate_launch_description():
 
     rviz = Node(
         package='rviz2',
-        executable='rviz2',
-        name='rviz2',
+        node_executable='rviz2',
+        node_name='rviz2',
         output='screen',
         arguments=['-d', rviz_config_file],
         parameters=[{'use_sim_time': True}],

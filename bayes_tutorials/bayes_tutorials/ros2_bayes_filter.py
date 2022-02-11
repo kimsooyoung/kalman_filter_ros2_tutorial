@@ -43,10 +43,12 @@ class BayesFilter(Node):
         self._corridor_map = [0, 1, 0, 1, 0, 0, 0, 1, 0, 0]
 
         self.declare_parameter('kernel', [.05, .9, .05])
-        self.declare_parameter('light_sensor_accuracy_rate', 0.05)
+        self.declare_parameter('light_sensor_accuracy_rate', 0.95)
 
         self._kernel = self.get_parameter('kernel').value
         self._light_sensor_accuracy_rate = self.get_parameter('light_sensor_accuracy_rate').value
+
+        print(f"{self._kernel} ////////// {self._light_sensor_accuracy_rate}")
 
         self._bayes_filter_iteration = 0
 
@@ -55,7 +57,7 @@ class BayesFilter(Node):
 
         likelihood = [1] * len(self._corridor_map)
 
-        for i, val in enumerate(likelihood):
+        for i, _ in enumerate(likelihood):
             if z == self._corridor_map[i]:
                 likelihood[i] *= self._light_sensor_accuracy_rate
             else:

@@ -5,10 +5,12 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='bayes_tutorials',
-            executable='bayes_filter_node',
+            node_executable='bayes_filter_node',
             parameters=[
-                {'kernel': [.05, .9, .05]},
+                {'kernel': [.025, .95, .025]},
                 {'light_sensor_accuracy_rate': 0.95},
+                # {'kernel': [.025, .95, .025]},
+                # {'light_sensor_accuracy_rate': 0.95},
             ],
             output='screen',
             emulate_tty=True
