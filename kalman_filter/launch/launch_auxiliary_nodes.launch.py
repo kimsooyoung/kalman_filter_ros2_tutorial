@@ -21,7 +21,7 @@ def generate_launch_description():
     world_path = os.path.join(pkg_path, 'worlds', 'neuronbot2_world.world')
     pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
 
-    model_pkg_path = os.path.join(get_package_share_directory('neuronbot2_gazebo'))
+    model_pkg_path = os.path.join(get_package_share_directory('sw_neuronbot2_gazebo'))
     gazebo_model_path = os.path.join(model_pkg_path, 'models')
 
     if 'GAZEBO_MODEL_PATH' in os.environ:
@@ -43,7 +43,7 @@ def generate_launch_description():
     )
 
     # Prepare Robot State Publisher Params
-    neuronbot_gazebo_pkg_path = os.path.join(get_package_share_directory('neuronbot2_gazebo'))
+    neuronbot_gazebo_pkg_path = os.path.join(get_package_share_directory('sw_neuronbot2_gazebo'))
     urdf_file = os.path.join(neuronbot_gazebo_pkg_path, 'urdf', 'neuronbot2.urdf')
 
     robot_state_publisher = Node(

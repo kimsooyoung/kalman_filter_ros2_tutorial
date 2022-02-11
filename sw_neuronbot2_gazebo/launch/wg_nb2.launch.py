@@ -13,8 +13,8 @@ from launch.substitutions import EnvironmentVariable
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='True')
     world = os.path.join('worlds/willowgarage.world')
-    launch_file_dir = os.path.join(get_package_share_directory('neuronbot2_gazebo'), 'launch')
-    gazebo_model_path = os.path.join(get_package_share_directory('neuronbot2_gazebo'), 'models')
+    launch_file_dir = os.path.join(get_package_share_directory('sw_neuronbot2_gazebo'), 'launch')
+    gazebo_model_path = os.path.join(get_package_share_directory('sw_neuronbot2_gazebo'), 'models')
     print(gazebo_model_path)
 
     if 'GAZEBO_MODEL_PATH' in os.environ:
@@ -39,7 +39,7 @@ def generate_launch_description():
         ExecuteProcess(
             cmd=['ros2', 'param', 'set', '/gazebo', 'use_sim_time', use_sim_time],
             output='screen'),
-            # ros2 run gazebo_ros spawn_entity.py -file /home/ros/nb2_sim_foxy_ws/install/neuronbot2_gazebo/share/neuronbot2_gazebo/models/neuronbot2/model.sdf -entity nb2
+            # ros2 run gazebo_ros spawn_entity.py -file /home/ros/nb2_sim_foxy_ws/install/sw_neuronbot2_gazebo/share/sw_neuronbot2_gazebo/models/neuronbot2/model.sdf -entity nb2
         
         ExecuteProcess(
             cmd=['ros2', 'run', 'gazebo_ros', 'spawn_entity.py', '-file' , gazebo_model_path + '/neuronbot2/' + 'model.sdf',
