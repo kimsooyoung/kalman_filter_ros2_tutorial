@@ -41,16 +41,24 @@ class KF1D(Node):
     def __init__(self):
         super().__init__('kalman_fileter_1D')
 
-        # self.declare_parameter('obstacle_front_x_axis', 11.0)
-        # self.declare_parameter('alpha_laser_scan', 0.05)
-        # self.declare_parameter('laser_scan_topic', 'scan')
+        self.declare_parameter('initial_mu', 5.0)
+        self.declare_parameter('initial_sig', 1000.0)
+        self.declare_parameter('motion_sig', 4.0)
+        self.declare_parameter('measurement_sig', 0.05)
+
+        self.declare_parameter('laser_scan_topic', 'scan')
         self.declare_parameter('verbose', "True")
 
         # self._obs_dis = self.get_parameter('obstacle_front_x_axis').value
 
         # # laser scan noise parameter, specifies the noise in the laser scan readings
-        # self._alpha_laser_scan = self.get_parameter('alpha_laser_scan').value
-        # self._laser_topic = str(self.get_parameter('laser_scan_topic').value)
+        self._initial_mu = self.get_parameter('initial_mu').value
+        self._initial_sig = self.get_parameter('initial_sig').value
+
+        # initialize motion sigma (the standard deviation of the motions normal distribution)
+        self._motion_sig = self.get_parameter('motion_sig').value
+        self._measurement_sig = self.get_parameter('measurement_sig').value
+
         self._verbose = eval(self.get_parameter('verbose').value)
 
         self._laser_sub = self.create_subscription(
@@ -71,16 +79,13 @@ class KF1D(Node):
         self._last_measurement = 0.0
 
         ### Add initial state HERE ###
-        self._mu = 5.0
-        self._sig = 1000.0
+        self._mu = self._initial_mu
+        self._sig = self._initial_sig
 
-        # initialize motion sigma (the standard deviation of the motions normal distribution)
-        self._motion_sig = 4.0
-        self._measurement_sig = 0.05
-        
         # distance since last filter cycle
         self._motion = 0.0
 
+        # Final Filtered Odom Msg
         self._odom_msg = Float64()
 
     ### Add correct_st`ep function HERE ###

@@ -63,5 +63,5 @@ communication
 
 ```
 ros2 launch kalman_filter launch_auxiliary_nodes.launch.py
-ros2 run kalman_filter kalman_1d
+ros2 launch kalman_filter kalman_filter.launch.py
 ```
