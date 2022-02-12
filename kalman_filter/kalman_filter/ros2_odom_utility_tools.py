@@ -32,6 +32,19 @@ import numpy as np
 # get_model_srv = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
 # teleport_service = rospy.ServiceProxy('/reset_model_pose', Trigger)
 
+"""
+OdomUtilNode에는 두 Class가 포함되어 있음
+- TeleportClient
+    reset_model_pose service call을 통해 로봇 위치 재설정 
+    teleport_service.py 참고
+- EntityStateClient
+    Gazebo에서 neuronbot2의 x 위치 즉, pose.position.x를 주기적으로 받는다.
+    이것이 ground_truth_x가 됨
+    ground_truth_x > 10 이면 로봇 위치 재설정
+
+x 위치 변화량에 따라 noisy_odom을 만든 뒤 noisy_odom_x topic publish를 한다.
+"""
+
 class EntityStateClient(Node):
 
     def __init__(self, model_name):

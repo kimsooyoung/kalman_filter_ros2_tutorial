@@ -20,6 +20,14 @@ from gazebo_msgs.srv import SetEntityState
 import rclpy
 from rclpy.node import Node
 
+"""
+/reset_model_pose를 받으면, has a 관계인 RespawnClient에서 
+set_entity_state를 call한다.
+
+set_entity_state는 neuronbot2 로봇의 위치를 
+[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]롤 재설정하도록 하는 service임
+"""
+
 class RespawnClient(Node):
 
     def __init__(self):

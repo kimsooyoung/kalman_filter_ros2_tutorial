@@ -22,6 +22,14 @@ from sensor_msgs.msg import LaserScan
 import math
 import numpy as np
 
+"""
+scan 데이터가 들어오면 front_laser_ray를 통해 전방 벽과의 거리를 측정
+x_position_in_map 즉, 로봇의 위치는 11m - front_laser_ray가 된다.
+
+여기에 0.05의 noise value를 곱한 다음, x_position_in_map에 더해서 noisy_measurement를 만든다.
+이 값이 /position_from_laser_ray 라는 이름으로 publish됨
+"""
+
 class LaserPositionNode(Node):
 
     def __init__(self):
