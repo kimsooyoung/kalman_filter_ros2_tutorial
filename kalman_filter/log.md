@@ -58,3 +58,10 @@ communication
 * Publisher : /position_from_laser_ray, Float64
 
  source /usr/share/gazebo/setup.sh
+
+# Final execution
+
+```
+ros2 launch kalman_filter launch_auxiliary_nodes.launch.py
+ros2 run kalman_filter kalman_1d
+```
