@@ -16,11 +16,11 @@ from osrf_pycommon.terminal_color import ansi
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
-    world = [get_package_share_directory('neuronbot2_gazebo'), '/worlds/']
+    world = [get_package_share_directory('sw_neuronbot2_gazebo'), '/worlds/']
     world.append(LaunchConfiguration('world_model', default='mememan_world.model'))
     use_camera = LaunchConfiguration('use_camera', default='none')
-    launch_file_dir = os.path.join(get_package_share_directory('neuronbot2_gazebo'), 'launch')
-    gazebo_model_path = os.path.join(get_package_share_directory('neuronbot2_gazebo'), 'models')
+    launch_file_dir = os.path.join(get_package_share_directory('sw_neuronbot2_gazebo'), 'launch')
+    gazebo_model_path = os.path.join(get_package_share_directory('sw_neuronbot2_gazebo'), 'models')
 
     if 'GAZEBO_MODEL_PATH' in os.environ:
         os.environ['GAZEBO_MODEL_PATH'] += ":" + gazebo_model_path
