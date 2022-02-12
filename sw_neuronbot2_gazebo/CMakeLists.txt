@@ -41,4 +41,15 @@ install(DIRECTORY launch worlds models urdf
   DESTINATION  share/${PROJECT_NAME}/
 )
 
+install(
+  DIRECTORY
+   launch
+   urdf
+   models
+   worlds
+  DESTINATION
+   share/${PROJECT_NAME}
+)
+
+
 ament_package()

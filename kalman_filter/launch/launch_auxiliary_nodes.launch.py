@@ -49,7 +49,7 @@ def generate_launch_description():
         node_executable='robot_state_publisher',
         node_name='robot_state_publisher',
         output='screen',
-        parameters=[{'use_sim_time': True}],
+        parameters=[{'use_sim_time': False}],
         arguments=[urdf_file],
     )
 
@@ -82,6 +82,7 @@ def generate_launch_description():
         output='screen',
         parameters=[
             {"obstacle_front_x_axis": 11.0},
+            {"alpha_laser_scan": 0.1},
             {"laser_scan_topic": "scan"},
             {"verbose": "False"},
         ]
@@ -105,6 +106,6 @@ def generate_launch_description():
         robot_state_publisher,
         teleport_service,
         odom_utility,
-        # laser_ray_localization,
+        laser_ray_localization,
         move_forward,
     ])

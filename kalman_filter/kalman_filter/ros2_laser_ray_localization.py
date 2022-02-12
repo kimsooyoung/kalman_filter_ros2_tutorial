@@ -17,6 +17,11 @@
 import rclpy
 from rclpy.node import Node
 
+from rclpy.qos import QoSDurabilityPolicy
+from rclpy.qos import QoSHistoryPolicy
+from rclpy.qos import QoSProfile
+from rclpy.qos import QoSReliabilityPolicy
+
 from std_msgs.msg import Float64
 from sensor_msgs.msg import LaserScan
 
@@ -29,26 +34,36 @@ class LaserPositionNode(Node):
         super().__init__('position_from_laser_ray_publisher')
 
         self.declare_parameter('obstacle_front_x_axis', 11.0)
-        self.declare_parameter('laser_scan_topic', '/scan')
+        self.declare_parameter('alpha_laser_scan', 0.05)
+        self.declare_parameter('laser_scan_topic', 'scan')
         self.declare_parameter('verbose', "True")
 
         self._obs_dis = self.get_parameter('obstacle_front_x_axis').value
-        self._laser_topic = self.get_parameter('laser_scan_topic').value
+
+        # laser scan noise parameter, specifies the noise in the laser scan readings
+        self._alpha_laser_scan = self.get_parameter('alpha_laser_scan').value
+        self._laser_topic = str(self.get_parameter('laser_scan_topic').value)
         self._verbose = eval(self.get_parameter('verbose').value)
 
         self._obs_dis_pub = self.create_publisher(
             Float64, 'position_from_laser_ray', 1
         )
 
+        qos_depth = 5
+
+        QOS_RKL10V = QoSProfile(
+            reliability=QoSReliabilityPolicy.BEST_EFFORT,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            depth=qos_depth,
+            durability=QoSDurabilityPolicy.VOLATILE)
+
         self._laser_sub = self.create_subscription(
-            LaserScan, 'scan', self.laser_scan_callback, 10
+            LaserScan, self._laser_topic, self.laser_scan_callback, QOS_RKL10V
         )
         self._laser_sub
 
         # global variables
         self._robot_x_axis_position = 0
-        # laser scan noise parameter, specifies the noise in the laser scan readings
-        self._alpha_laser_scan = 0.05
         # pub msg
         self._robot_x_axis_position = Float64()
 
@@ -59,17 +74,18 @@ class LaserPositionNode(Node):
             print("-----------------------------------------------------\n")
 
     def laser_scan_callback(self, msg):
-        print("-----------------------------------------------------\n")
+        # print("-----------------------------------------------------\n")
+        # self.get_logger().info(f'Distance from Front Object : {msg.ranges[10]}')
 
         # keep the minimum distance reading from 10 rays pointing to the front
         # second min is required to filter out 'inf' values, in that case 12 is used 
         front_laser_ray = min(min(msg.ranges), self._obs_dis)
         # print(min(msg.ranges[354:363]), len(msg.ranges))
 
-        print(msg.ranges)
         for i, point in enumerate(msg.ranges):
             if point != math.inf:
-                print(i, point)
+                if self._verbose:
+                    print(i, point)
 
         if self._verbose:
             self.get_logger().info(f"Distance to object in front (front_laser_ray): {front_laser_ray}")
@@ -88,24 +104,10 @@ class LaserPositionNode(Node):
         self._robot_x_axis_position.data =  np.random.normal(x_position_in_map, sd_trans * sd_trans)
         self._obs_dis_pub.publish(self._robot_x_axis_position)
 
-class LaserSubscriber(Node):
-
-    def __init__(self):
-        super().__init__('laser_sub_node')
-        queue_size = 10  # Queue Size
-        self.subscriber = self.create_subscription(
-            LaserScan, 'scan', self.sub_callback, queue_size
-        )
-        self.subscriber  # prevent unused variable warning
-
-    def sub_callback(self, msg):
-        self.get_logger().info(f'Distance from Front Object : {msg.ranges[360]}')
-
-
 def main(args=None):
     rclpy.init(args=args)
 
-    laser_position_node = LaserSubscriber()
+    laser_position_node = LaserPositionNode()
 
     rclpy.spin(laser_position_node)
 

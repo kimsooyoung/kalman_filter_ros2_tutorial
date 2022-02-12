@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot
-  name="sw_neuronbot2_gazebo/models/neuronbot2">
+  name="sw_neuronbot2_description">
 
   <!-- Color definition -->
   <material name="white">
